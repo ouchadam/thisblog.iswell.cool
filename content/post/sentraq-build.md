@@ -5,10 +5,8 @@ description = "Sentraq S60-X build"
 draft = true
 tags = ["sentraq"]
 title = "Building the Sentraq S60-X"
-
 +++
-
-
+<br>
 Bought from [Massdrop](https://www.massdrop.com/buy/sentraq-60-diy-keyboard-kit), the Sentraq S60-X is like the name hints, a 60% DIY mechanical keyboard. Marketed as an entry level introduction to DIY keyboards, the Sentraq features a [TMK](https://github.com/tmk/tmk_keyboard) flashable chipset and EZ \*5~ piece assembly; perfect for my two left hands.
 
 \*circuit board, plate, case, stabilizers and switches
@@ -20,7 +18,7 @@ __<i>the finished result</i>__
 {{< figure src="/end-result.png" >}}
 
 <i>White plastic case, black plate, blank pbt keycaps and cherry brown switches.</i>
-
+<!--more-->
 <br>
 
 ## Getting started
