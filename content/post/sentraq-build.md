@@ -2,7 +2,6 @@
 categories = ["diy", "keyboard"]
 date = "2016-09-20T22:23:13+01:00"
 description = "Sentraq S60-X build"
-draft = true
 tags = ["sentraq"]
 title = "Building the Sentraq S60-X"
 +++
