@@ -2,6 +2,7 @@
   {{ .Title }} &ndash; {{ .Site.Title }}
 {{- end }}
 {{ define "header" }}
+  {{ partial "header.includes" . }}
   {{ partial "menu" . }}
 {{ end }}
 {{ define "main" }}
@@ -12,5 +13,4 @@
   <hr>
   {{ partial "post/byline" . }}
   {{ partial "post/related-posts" . }}
-  <!-- {{ partial "powered-by" . }} -->
 {{ end }}
