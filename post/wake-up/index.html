@@ -4,12 +4,10 @@
     <meta name="generator" content="Hugo 0.16" />
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Blog</title>
+    <title>Wake up, yo &ndash; Blog</title>
     
     
-      <link href="http://thisblog.iswell.cool/categories/keyboard/index.xml" rel="alternate" type="application/rss+xml" title="Blog" />
-    
-    <link rel="canonical" href="http://thisblog.iswell.cool/categories/keyboard/">
+    <link rel="canonical" href="http://thisblog.iswell.cool/post/wake-up/">
     
     
     <link rel="shortcut icon" type="image/png" href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAYAAACqaXHeAAAABGdBTUEAALGPC/xhBQAAG+ZJREFU
@@ -195,6 +193,10 @@ jJasrM9JHpMQoTocKVCL4IPr/fOT+fzoT3p+SelrFs2odf2vmwZACVzT9SAJ8iKO6OCx+/tKkw2M
   </head>
   <body class="hack dark main container">
     <header>
+  <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.6.0/styles/solarized-dark.min.css">
+<script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.6.0/highlight.min.js"></script>
+<script>hljs.initHighlightingOnLoad();</script>
+
   
   <nav>
     
@@ -204,51 +206,235 @@ jJasrM9JHpMQoTocKVCL4IPr/fOT+fzoT3p+SelrFs2odf2vmwZACVzT9SAJ8iKO6OCx+/tKkw2M
 
 </header>
     <main>
-  <h1>Keyboard</h1>
+  <h1>Wake up, yo</h1>
   
-    <article>
-      <h2><a href="http://thisblog.iswell.cool/post/sentraq-build/">Building the Sentraq S60-X</a></h2>
-      <p><p><br>
-Bought from <a href="https://www.massdrop.com/buy/sentraq-60-diy-keyboard-kit">Massdrop</a>, the Sentraq S60-X is like the name hints, a 60% DIY mechanical keyboard. Marketed as an entry level introduction to DIY keyboards, the Sentraq features a <a href="https://github.com/tmk/tmk_keyboard">TMK</a> flashable chipset and EZ *5~ piece assembly; perfect for my two left hands.</p>
-
-<p>*circuit board, plate, case, stabilizers and switches</p>
 
 <p><br></p>
 
-<p><strong><i>the finished result</i></strong></p>
+<p>Unless you&rsquo;re lucky enough to have one of those fancy routers running custom firmware like ddwrt, when it comes to wake on lan, you need to be on the local network. Or you can go down the painful and scary route of allowing external magic packets to be forwarded&hellip;</p>
 
+<p>A simple solution is to make the wake on lan request from inside the network. Wake on lan is a <i>magic packet</i> (yes that&rsquo;s the real name), typically broadcast over UDP to the address of 255.255.255.255 (the entire local network).</p>
 
-<figure >
-    
-        <img src="/end-result.png" />
-    
-    
-</figure>
+<p>Sounds like a job for a spare raspberry pi.</p>
 
+<p><br></p>
 
-<p><i>White plastic case, black plate, blank pbt keycaps and cherry brown switches.</i></p>
-</p>
-    </article>
-  
+<h3 id="prerequisites">Prerequisites</h3>
+
+<ul>
+<li>A device/environment capable of running all the tools, such as a raspberry pi running <a href="https://www.raspbian.org/">raspbian</a>.</li>
+<li><a href="https://www.npmjs.com/">npm</a> &amp; <a href="https://nodejs.org/en/">nodejs</a>.</li>
+<li>a static local ip address assigned to the device/environment.</li>
+<li>Port 80 forwarded by your router to the device/environment.</li>
+<li><a href="https://www.nginx.com/">nginx</a></li>
+<li>dynamic dns (unless you have a static ip from your ISP).</li>
+</ul>
+
+<p><br></p>
+
+<h3 id="back-end">Back-end</h3>
+
+<p>First of all, we&rsquo;re going to need a server to listen to our external wake up requests.</p>
+
+<p>Lets do this with nodejs by creating a new javascript file, <code>index.js</code>. We can run the server using <code>node index.js</code>. Any time <code>require('module-name')</code> is used, we&rsquo;ll need to run <code>npm install module-name</code> which will pull down the dependencies into <code>node_modules</code>.</p>
+
+<pre><code class="language-javascript">
+  const express = require('express');
+  const app = express();
+  const httpServer = require('http').Server(app);
+
+  httpServer.listen(3001, function() {
+    console.log('listening on *:3001');
+  });
+
+</code></pre>
+
+<p>great, we&rsquo;ve got a server now what? Let&rsquo;s create and send a magic packet using the <a href="https://github.com/agnat/node_wake_on_lan">wake_on_lan</a> module.</p>
+
+<pre><code class="language-javascript">
+  const wol = require('wake_on_lan');
+
+  app.get('/wake', function(req, res){
+    wol.wake('12:AB:34:CD:EF:56');
+    res.end();
+  });
+
+</code></pre>
+
+<p>bam, we&rsquo;ve got a back-end that will dispatch a wake on lan magic packet for a hardcoded mac address when the <code>/wake</code> route is hit.</p>
+
+<p>If everything went well, with the server running we should be able to see our wake up route in action with:</p>
+
+<pre><code class="language-bash">
+  curl -v localhost:3001/wake
+
+</code></pre>
+
+<p><br></p>
+
+<h3 id="exposing-to-world">Exposing to world</h3>
+
+<p>This is where things get <i>networky</i> and confusing. We need to hit our server from outside of the local network, no more localhost. If you&rsquo;re lucky enough to have a static ip then you can pair it up with a domain name and be on your way, for the rest of us we&rsquo;ll need to use a dynamic dns.</p>
+
+<p>There are plenty of dynamic dns providers, some provide free tiers such as <a href="http://www.noip.com/">noip</a> and others like <a href="http://dyn.com/dns/">dyndns</a> offer higher support with routers (rather than manually updating the dns).</p>
+
+<p>There are plenty of guides out there so I won&rsquo;t go into much detail here. Once the dns is setup, it&rsquo;s time to forward those external requests to our internal server.</p>
+
+<p>Using <a href="https://www.nginx.com/">nginx</a> and assuming that port 80 has been forward to the device, here&rsquo;s a simple web server acting as a proxy pass for our nodejs server using the <code>/wake</code> route:</p>
+
+<pre><code class="language-bash">
+  server {
+    listen 80;
+    server_name mydomain.com;
+
+    proxy_set_header        Host $host;
+    proxy_set_header        X-Real-IP $remote_addr;
+    proxy_set_header        X-Forwarded-For $proxy_add_x_forwarded_for;
+    proxy_set_header        X-Forwarded-Proto $scheme;
+
+    location /wake/ {
+      proxy_pass http://localhost:3001;
+    }
+  }
+
+</code></pre>
+
+<p>At this point, rerunning the <code>curl</code> command from earlier with your exported domain name <code>curl -v mydomain.com/wake</code> will turn on your desired device from outside the network! If you&rsquo;re planning on providing your own way to triggering this skip to deployment, otherwise lets build a website.</p>
+
+<p><br></p>
+
+<h3 id="front-end">Front-end</h3>
+
+<p>Now that we have a back-end, we need a way to interact with it. This could be achieved with a bash script, android/iOS application, Alexa integration or even IFTTT, but for this example lets do a simple web page.</p>
+
+<p>To keep things simple I&rsquo;ll be serving the web page from the same nodejs server we created earlier.</p>
+
+<p>First up is creating the page <i>index.html</i> with a button that will be used to hit our back-end <code>/wake</code> endpoint.</p>
+
+<pre><code class="language-html">
+  &lt;!DOCTYPE html&gt;
+  &lt;html&gt;
+    &lt;head&gt;
+      &lt;title&gt;Wake up&lt;/title&gt;
+    &lt;/head&gt;
+    &lt;body&gt;
+      &lt;h1&gt;Wake up&lt;/h1&gt;
+      &lt;button&gt;Wake up, yo&lt;/button&gt;
+    &lt;/body&gt;
+  &lt;/html&gt;
+
+</code></pre>
+
+<p>Super ugly but functional webpage. Next on the list is serving the page when we hit <code>localhost:3001/</code> in a browser by adding a route on <code>/</code> and sending the file we just created.</p>
+
+<pre><code class="language-javascript">
+  app.get('/', function(req, res) {
+    res.sendFile(__dirname + '/index.html');
+  });
+
+</code></pre>
+
+<p>At this point we should be able to see the page we created and click the wake button! but nothing happens yet&hellip; so lets link it up to the back-end with a get request using <a href="https://jquery.com/">jquery</a>.</p>
+
+<pre><code class="language-html">
+  &lt;script src=&quot;https://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js&quot;&gt;&lt;/script&gt;
+  &lt;script&gt;
+    var onWake = function() {
+      $.get(&quot;mydomain.com&quot; + &quot;/wake&quot;);
+    };
+  &lt;/script&gt;
+
+  ...
+
+  &lt;button onclick=&quot;onWake()&quot;&gt;Wake up, yo&lt;/button&gt;
+
+  ...
+
+</code></pre>
+
+<p><br></p>
+
+<h3 id="deployment">Deployment</h3>
+
+<p>Now that everything is up and running (hopefully), it&rsquo;s time to tidy up. First action is moving the code to a more conventional location, such as <code>/var/www/</code> with a sub directory <code>wake-up</code>.</p>
+
+<p>Since we&rsquo;re using nodejs to spawn a server, we&rsquo;ll want to make sure to handle auto starting on boot and errors. <code>systemd</code> to the rescue.</p>
+
+<p>To use systemd, we need to create a service <code>/etc/systemd/system/wake-up.service</code></p>
+
+<pre><code class="language-bash">
+  [Unit]
+  Description=Wake up server
+
+  [Service]
+  ExecStart=/path/to/node /var/www/wake-up/index.js
+  Restart=always
+  RestartSec=10
+  StandardOutput=syslog
+  StandardError=syslog
+  SyslogIdentifier=wake-up
+  Environment=NODE_ENV=production
+
+  [Install]
+  WantedBy=multi-user.target
+
+</code></pre>
+
+<ul>
+<li>replace /path/to/node with the output of <code>whereis node</code></li>
+<li>enable on boot with <code>systemctl enable wake-up.service</code></li>
+<li>start the service manually with <code>systemctl start wake-up.service</code></li>
+</ul>
+
+<p><br></p>
+
+<h3 id="finito">Finito</h3>
+
+<p>I skipped a lot of details, flaw and features, this guide was mainly to get the creative juices flowing.</p>
+
+<ul>
+<li><p>The server should definitely be running on port 443/ssl, you can generate free certificates with <a href="https://letsencrypt.org/">letsencrypt</a></p></li>
+
+<li><p>Basic authentication could be used or a secret key as part of the expected <code>/wake</code> request body to avoid unknown clients connecting to the server.</p></li>
+
+<li><p>The website could ping the machine to check if it&rsquo;s already on!</p></li>
+</ul>
+
+<p>For the full code and some extras see <a href="https://github.com/ouchadam/wake-up">https://github.com/ouchadam/wake-up</a></p>
+
 </main>
     <footer>
-  <nav>
+  <hr>
   <p>
-    
-    <span>Page 1 of 1</span>
-    
-  </p>
-</nav>
+  Published
+  
+  on <time datetime="2016-11-21T20:00:00&#43;01:00">21 Nov, 2016</time>
+  
+    in <a href="/categories/diy/">diy</a>
+  
+  
+    and tagged <a href="/tags/diy/">diy</a>, <a href="/tags/javascript/">javascript</a>, <a href="/tags/nodejs/">nodejs</a>, <a href="/tags/raspberry-pi/">raspberry pi</a> and <a href="/tags/wol/">wol</a>
+  
+  using 902 words
+  for a 5 minute read.
+</p>
 
   
-  <p class="powered-by">
-    This page was generated by
-    <a href="https://gohugo.io/">Hugo</a>
-    using the
-    <a href="https://comfusion.github.io/after-dark/">After Dark</a>
-    theme by
-    <a href="https://habd.as">Josh Habdas</a>.
-  </p>
+
+
+
+  
+  
+  
+
+  
+  
+  
+
+  
+  
+  
+
 
 
 </footer>

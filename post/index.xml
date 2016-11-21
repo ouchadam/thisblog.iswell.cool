@@ -6,8 +6,211 @@
     <description>Recent content in Posts on Blog</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
-    <lastBuildDate>Tue, 20 Sep 2016 22:23:13 +0100</lastBuildDate>
+    <lastBuildDate>Mon, 21 Nov 2016 20:00:00 +0100</lastBuildDate>
     <atom:link href="http://thisblog.iswell.cool/post/index.xml" rel="self" type="application/rss+xml" />
+    
+    <item>
+      <title>Wake up, yo</title>
+      <link>http://thisblog.iswell.cool/post/wake-up/</link>
+      <pubDate>Mon, 21 Nov 2016 20:00:00 +0100</pubDate>
+      
+      <guid>http://thisblog.iswell.cool/post/wake-up/</guid>
+      <description>
+
+&lt;p&gt;&lt;br&gt;&lt;/p&gt;
+
+&lt;p&gt;Unless you&amp;rsquo;re lucky enough to have one of those fancy routers running custom firmware like ddwrt, when it comes to wake on lan, you need to be on the local network. Or you can go down the painful and scary route of allowing external magic packets to be forwarded&amp;hellip;&lt;/p&gt;
+
+&lt;p&gt;A simple solution is to make the wake on lan request from inside the network. Wake on lan is a &lt;i&gt;magic packet&lt;/i&gt; (yes that&amp;rsquo;s the real name), typically broadcast over UDP to the address of 255.255.255.255 (the entire local network).&lt;/p&gt;
+
+&lt;p&gt;Sounds like a job for a spare raspberry pi.&lt;/p&gt;
+
+&lt;p&gt;&lt;br&gt;&lt;/p&gt;
+
+&lt;h3 id=&#34;prerequisites&#34;&gt;Prerequisites&lt;/h3&gt;
+
+&lt;ul&gt;
+&lt;li&gt;A device/environment capable of running all the tools, such as a raspberry pi running &lt;a href=&#34;https://www.raspbian.org/&#34;&gt;raspbian&lt;/a&gt;.&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;https://www.npmjs.com/&#34;&gt;npm&lt;/a&gt; &amp;amp; &lt;a href=&#34;https://nodejs.org/en/&#34;&gt;nodejs&lt;/a&gt;.&lt;/li&gt;
+&lt;li&gt;a static local ip address assigned to the device/environment.&lt;/li&gt;
+&lt;li&gt;Port 80 forwarded by your router to the device/environment.&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;https://www.nginx.com/&#34;&gt;nginx&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;dynamic dns (unless you have a static ip from your ISP).&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;&lt;br&gt;&lt;/p&gt;
+
+&lt;h3 id=&#34;back-end&#34;&gt;Back-end&lt;/h3&gt;
+
+&lt;p&gt;First of all, we&amp;rsquo;re going to need a server to listen to our external wake up requests.&lt;/p&gt;
+
+&lt;p&gt;Lets do this with nodejs by creating a new javascript file, &lt;code&gt;index.js&lt;/code&gt;. We can run the server using &lt;code&gt;node index.js&lt;/code&gt;. Any time &lt;code&gt;require(&#39;module-name&#39;)&lt;/code&gt; is used, we&amp;rsquo;ll need to run &lt;code&gt;npm install module-name&lt;/code&gt; which will pull down the dependencies into &lt;code&gt;node_modules&lt;/code&gt;.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-javascript&#34;&gt;
+  const express = require(&#39;express&#39;);
+  const app = express();
+  const httpServer = require(&#39;http&#39;).Server(app);
+
+  httpServer.listen(3001, function() {
+    console.log(&#39;listening on *:3001&#39;);
+  });
+
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;great, we&amp;rsquo;ve got a server now what? Let&amp;rsquo;s create and send a magic packet using the &lt;a href=&#34;https://github.com/agnat/node_wake_on_lan&#34;&gt;wake_on_lan&lt;/a&gt; module.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-javascript&#34;&gt;
+  const wol = require(&#39;wake_on_lan&#39;);
+
+  app.get(&#39;/wake&#39;, function(req, res){
+    wol.wake(&#39;12:AB:34:CD:EF:56&#39;);
+    res.end();
+  });
+
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;bam, we&amp;rsquo;ve got a back-end that will dispatch a wake on lan magic packet for a hardcoded mac address when the &lt;code&gt;/wake&lt;/code&gt; route is hit.&lt;/p&gt;
+
+&lt;p&gt;If everything went well, with the server running we should be able to see our wake up route in action with:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-bash&#34;&gt;
+  curl -v localhost:3001/wake
+
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;&lt;br&gt;&lt;/p&gt;
+
+&lt;h3 id=&#34;exposing-to-world&#34;&gt;Exposing to world&lt;/h3&gt;
+
+&lt;p&gt;This is where things get &lt;i&gt;networky&lt;/i&gt; and confusing. We need to hit our server from outside of the local network, no more localhost. If you&amp;rsquo;re lucky enough to have a static ip then you can pair it up with a domain name and be on your way, for the rest of us we&amp;rsquo;ll need to use a dynamic dns.&lt;/p&gt;
+
+&lt;p&gt;There are plenty of dynamic dns providers, some provide free tiers such as &lt;a href=&#34;http://www.noip.com/&#34;&gt;noip&lt;/a&gt; and others like &lt;a href=&#34;http://dyn.com/dns/&#34;&gt;dyndns&lt;/a&gt; offer higher support with routers (rather than manually updating the dns).&lt;/p&gt;
+
+&lt;p&gt;There are plenty of guides out there so I won&amp;rsquo;t go into much detail here. Once the dns is setup, it&amp;rsquo;s time to forward those external requests to our internal server.&lt;/p&gt;
+
+&lt;p&gt;Using &lt;a href=&#34;https://www.nginx.com/&#34;&gt;nginx&lt;/a&gt; and assuming that port 80 has been forward to the device, here&amp;rsquo;s a simple web server acting as a proxy pass for our nodejs server using the &lt;code&gt;/wake&lt;/code&gt; route:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-bash&#34;&gt;
+  server {
+    listen 80;
+    server_name mydomain.com;
+
+    proxy_set_header        Host $host;
+    proxy_set_header        X-Real-IP $remote_addr;
+    proxy_set_header        X-Forwarded-For $proxy_add_x_forwarded_for;
+    proxy_set_header        X-Forwarded-Proto $scheme;
+
+    location /wake/ {
+      proxy_pass http://localhost:3001;
+    }
+  }
+
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;At this point, rerunning the &lt;code&gt;curl&lt;/code&gt; command from earlier with your exported domain name &lt;code&gt;curl -v mydomain.com/wake&lt;/code&gt; will turn on your desired device from outside the network! If you&amp;rsquo;re planning on providing your own way to triggering this skip to deployment, otherwise lets build a website.&lt;/p&gt;
+
+&lt;p&gt;&lt;br&gt;&lt;/p&gt;
+
+&lt;h3 id=&#34;front-end&#34;&gt;Front-end&lt;/h3&gt;
+
+&lt;p&gt;Now that we have a back-end, we need a way to interact with it. This could be achieved with a bash script, android/iOS application, Alexa integration or even IFTTT, but for this example lets do a simple web page.&lt;/p&gt;
+
+&lt;p&gt;To keep things simple I&amp;rsquo;ll be serving the web page from the same nodejs server we created earlier.&lt;/p&gt;
+
+&lt;p&gt;First up is creating the page &lt;i&gt;index.html&lt;/i&gt; with a button that will be used to hit our back-end &lt;code&gt;/wake&lt;/code&gt; endpoint.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-html&#34;&gt;
+  &amp;lt;!DOCTYPE html&amp;gt;
+  &amp;lt;html&amp;gt;
+    &amp;lt;head&amp;gt;
+      &amp;lt;title&amp;gt;Wake up&amp;lt;/title&amp;gt;
+    &amp;lt;/head&amp;gt;
+    &amp;lt;body&amp;gt;
+      &amp;lt;h1&amp;gt;Wake up&amp;lt;/h1&amp;gt;
+      &amp;lt;button&amp;gt;Wake up, yo&amp;lt;/button&amp;gt;
+    &amp;lt;/body&amp;gt;
+  &amp;lt;/html&amp;gt;
+
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Super ugly but functional webpage. Next on the list is serving the page when we hit &lt;code&gt;localhost:3001/&lt;/code&gt; in a browser by adding a route on &lt;code&gt;/&lt;/code&gt; and sending the file we just created.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-javascript&#34;&gt;
+  app.get(&#39;/&#39;, function(req, res) {
+    res.sendFile(__dirname + &#39;/index.html&#39;);
+  });
+
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;At this point we should be able to see the page we created and click the wake button! but nothing happens yet&amp;hellip; so lets link it up to the back-end with a get request using &lt;a href=&#34;https://jquery.com/&#34;&gt;jquery&lt;/a&gt;.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-html&#34;&gt;
+  &amp;lt;script src=&amp;quot;https://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js&amp;quot;&amp;gt;&amp;lt;/script&amp;gt;
+  &amp;lt;script&amp;gt;
+    var onWake = function() {
+      $.get(&amp;quot;mydomain.com&amp;quot; + &amp;quot;/wake&amp;quot;);
+    };
+  &amp;lt;/script&amp;gt;
+
+  ...
+
+  &amp;lt;button onclick=&amp;quot;onWake()&amp;quot;&amp;gt;Wake up, yo&amp;lt;/button&amp;gt;
+
+  ...
+
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;&lt;br&gt;&lt;/p&gt;
+
+&lt;h3 id=&#34;deployment&#34;&gt;Deployment&lt;/h3&gt;
+
+&lt;p&gt;Now that everything is up and running (hopefully), it&amp;rsquo;s time to tidy up. First action is moving the code to a more conventional location, such as &lt;code&gt;/var/www/&lt;/code&gt; with a sub directory &lt;code&gt;wake-up&lt;/code&gt;.&lt;/p&gt;
+
+&lt;p&gt;Since we&amp;rsquo;re using nodejs to spawn a server, we&amp;rsquo;ll want to make sure to handle auto starting on boot and errors. &lt;code&gt;systemd&lt;/code&gt; to the rescue.&lt;/p&gt;
+
+&lt;p&gt;To use systemd, we need to create a service &lt;code&gt;/etc/systemd/system/wake-up.service&lt;/code&gt;&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-bash&#34;&gt;
+  [Unit]
+  Description=Wake up server
+
+  [Service]
+  ExecStart=/path/to/node /var/www/wake-up/index.js
+  Restart=always
+  RestartSec=10
+  StandardOutput=syslog
+  StandardError=syslog
+  SyslogIdentifier=wake-up
+  Environment=NODE_ENV=production
+
+  [Install]
+  WantedBy=multi-user.target
+
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;ul&gt;
+&lt;li&gt;replace /path/to/node with the output of &lt;code&gt;whereis node&lt;/code&gt;&lt;/li&gt;
+&lt;li&gt;enable on boot with &lt;code&gt;systemctl enable wake-up.service&lt;/code&gt;&lt;/li&gt;
+&lt;li&gt;start the service manually with &lt;code&gt;systemctl start wake-up.service&lt;/code&gt;&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;&lt;br&gt;&lt;/p&gt;
+
+&lt;h3 id=&#34;finito&#34;&gt;Finito&lt;/h3&gt;
+
+&lt;p&gt;I skipped a lot of details, flaw and features, this guide was mainly to get the creative juices flowing.&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;&lt;p&gt;The server should definitely be running on port 443/ssl, you can generate free certificates with &lt;a href=&#34;https://letsencrypt.org/&#34;&gt;letsencrypt&lt;/a&gt;&lt;/p&gt;&lt;/li&gt;
+
+&lt;li&gt;&lt;p&gt;Basic authentication could be used or a secret key as part of the expected &lt;code&gt;/wake&lt;/code&gt; request body to avoid unknown clients connecting to the server.&lt;/p&gt;&lt;/li&gt;
+
+&lt;li&gt;&lt;p&gt;The website could ping the machine to check if it&amp;rsquo;s already on!&lt;/p&gt;&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;For the full code and some extras see &lt;a href=&#34;https://github.com/ouchadam/wake-up&#34;&gt;https://github.com/ouchadam/wake-up&lt;/a&gt;&lt;/p&gt;
+</description>
+    </item>
     
     <item>
       <title>Building the Sentraq S60-X</title>
