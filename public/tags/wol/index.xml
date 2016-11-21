@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="utf-8" standalone="yes" ?>
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
-    <title>Blog</title>
-    <link>http://thisblog.iswell.cool/</link>
-    <description>Recent content on Blog</description>
+    <title>Wol on Blog</title>
+    <link>http://thisblog.iswell.cool/tags/wol/</link>
+    <description>Recent content in Wol on Blog</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
     <lastBuildDate>Mon, 21 Nov 2016 20:00:00 +0100</lastBuildDate>
-    <atom:link href="http://thisblog.iswell.cool/index.xml" rel="self" type="application/rss+xml" />
+    <atom:link href="http://thisblog.iswell.cool/tags/wol/index.xml" rel="self" type="application/rss+xml" />
     
     <item>
       <title>Wake up, yo</title>
@@ -209,142 +209,6 @@
 &lt;/ul&gt;
 
 &lt;p&gt;For the full code and some extras see &lt;a href=&#34;https://github.com/ouchadam/wake-up&#34;&gt;https://github.com/ouchadam/wake-up&lt;/a&gt;&lt;/p&gt;
-</description>
-    </item>
-    
-    <item>
-      <title>Building the Sentraq S60-X</title>
-      <link>http://thisblog.iswell.cool/post/sentraq-build/</link>
-      <pubDate>Tue, 20 Sep 2016 22:23:13 +0100</pubDate>
-      
-      <guid>http://thisblog.iswell.cool/post/sentraq-build/</guid>
-      <description>
-
-&lt;p&gt;&lt;br&gt;
-Bought from &lt;a href=&#34;https://www.massdrop.com/buy/sentraq-60-diy-keyboard-kit&#34;&gt;Massdrop&lt;/a&gt;, the Sentraq S60-X is like the name hints, a 60% DIY mechanical keyboard. Marketed as an entry level introduction to DIY keyboards, the Sentraq features a &lt;a href=&#34;https://github.com/tmk/tmk_keyboard&#34;&gt;TMK&lt;/a&gt; flashable chipset and EZ *5~ piece assembly; perfect for my two left hands.&lt;/p&gt;
-
-&lt;p&gt;*circuit board, plate, case, stabilizers and switches&lt;/p&gt;
-
-&lt;p&gt;&lt;br&gt;&lt;/p&gt;
-
-&lt;p&gt;&lt;strong&gt;&lt;i&gt;the finished result&lt;/i&gt;&lt;/strong&gt;&lt;/p&gt;
-
-
-&lt;figure &gt;
-    
-        &lt;img src=&#34;http://thisblog.iswell.cool/end-result.png&#34; /&gt;
-    
-    
-&lt;/figure&gt;
-
-
-&lt;p&gt;&lt;i&gt;White plastic case, black plate, blank pbt keycaps and cherry brown switches.&lt;/i&gt;&lt;/p&gt;
-
-&lt;p&gt;&lt;br&gt;&lt;/p&gt;
-
-&lt;h2 id=&#34;getting-started&#34;&gt;Getting started&lt;/h2&gt;
-
-&lt;p&gt;Apart from the obvious equipment like a soldering iron, the simplicity of the build means that nothing extra is needed, all the components are already included inside the kit, even an ugly usb micro cable, &lt;i&gt;score!&lt;/i&gt;&lt;/p&gt;
-
-&lt;p&gt;There&amp;rsquo;s 130~ solder joints to make but don&amp;rsquo;t let that put you off, the sockets are nicely separately and the action of clicking in the switch to the plate helps to keep the switch pins nice and tight. A soldering novice would have no problems making a decent connection, just make sure the you have a clean tip.&lt;/p&gt;
-
-&lt;p&gt;&lt;br&gt;&lt;/p&gt;
-
-&lt;h2 id=&#34;stabilizers&#34;&gt;Stabilizers&lt;/h2&gt;
-
-&lt;p&gt;Stabilizers stabilizers stabilizers!1! It&amp;rsquo;s tempting to start by inserting the switches straight into the plate &lt;i&gt;(I did and ended up having to undo all of them)&lt;/i&gt; but hold off, it will make the build 10x harder, if not impossible to line up the plate to the board.&lt;/p&gt;
-
-
-&lt;figure &gt;
-    
-        &lt;img src=&#34;http://thisblog.iswell.cool/stabilizers_2.png&#34; /&gt;
-    
-    
-&lt;/figure&gt;
-
-
-&lt;p&gt;The stabilizers themselves are a little fiddly to put together, but simple enough once you&amp;rsquo;ve done a pair. When mounting the stabilizers be careful to align them correctly to your layout; I went with &lt;a href=&#34;http://thisblog.iswell.cool/ansi_layout.webp&#34;&gt;ansi&lt;/a&gt;).&lt;/p&gt;
-
-&lt;p&gt;&lt;a href=&#34;https://www.youtube.com/channel/UCUodUNwfU_X_W_8nkUNQDkg&#34;&gt;Jack Humbert&lt;/a&gt; provides a fantastic &lt;a href=&#34;https://www.youtube.com/watch?v=S2FApwzVxAQ&#34;&gt;video&lt;/a&gt; on how to assemble and mount the stabilizers, it&amp;rsquo;s for a different DIY board but it&amp;rsquo;s still relevant.&lt;/p&gt;
-
-&lt;p&gt;&lt;br&gt;&lt;/p&gt;
-
-&lt;h2 id=&#34;plate&#34;&gt;Plate&lt;/h2&gt;
-
-&lt;p&gt;Next up is mounting the plate. Part of the reason for inserting the stabilizers first is because the plate goes on top! &lt;i&gt;(dur)&lt;/i&gt;. When resting on just the stabilizers the plate is a bit wobbly, this goes away as more switches are soldered to the board but it does make the first few a bit tricky.&lt;/p&gt;
-
-
-&lt;figure &gt;
-    
-        &lt;img src=&#34;http://thisblog.iswell.cool/mount_the_plate.png&#34; /&gt;
-    
-    
-&lt;/figure&gt;
-
-
-&lt;p&gt;Soldering the switches around the corner positions tighted the plate up to the board and meant the remaining switches needed less pressure to keep the pins fully penetrated.&lt;/p&gt;
-
-&lt;p&gt;&lt;br&gt;&lt;/p&gt;
-
-&lt;h2 id=&#34;switches-case-keycaps&#34;&gt;Switches, case &amp;amp; keycaps&lt;/h2&gt;
-
-&lt;p&gt;Not much else to say other than continue soldering the rest of the switches and then screw in the case. I would advise not screwing the board into the case until every key has been tested&lt;/p&gt;
-
-
-&lt;figure &gt;
-    
-        &lt;img src=&#34;http://thisblog.iswell.cool/without_caps.png&#34; /&gt;
-    
-    
-&lt;/figure&gt;
-
-
-&lt;p&gt;&lt;br&gt;&lt;/p&gt;
-
-&lt;h2 id=&#34;ruh-roh&#34;&gt;ruh roh&lt;/h2&gt;
-
-&lt;p&gt;As with everything I build, there&amp;rsquo;s always a problem of some sort, this time I had a non functioning key.&lt;/p&gt;
-
-&lt;p&gt;After assembling the entire board and what I thought was a firmware problem, I realised that the bottom left super key was not triggering. Checking, replacing and resoldering the switch made no difference, something else was wrong.&lt;/p&gt;
-
-&lt;p&gt;&lt;i&gt;And that&amp;rsquo;s when I noticed&amp;hellip;&lt;/i&gt;&lt;/p&gt;
-
-
-&lt;figure &gt;
-    
-        &lt;img src=&#34;http://thisblog.iswell.cool/d60.png&#34; /&gt;
-    
-    
-&lt;/figure&gt;
-
-
-&lt;p&gt;D60 looks a bit different to D59, wtf. Diode no.60 is missing a case and the right pin no longer makes a connection to the body, ruh roh.
-Massdrop support were helpful and fast to reply but they wanted to replace the board I had just poured hours of love into, not happening.&lt;/p&gt;
-
-&lt;p&gt;Due to having the patience of a five year old at christmas, I started to question the existence of D60. Why does a keyboard need diodes?&lt;/p&gt;
-
-&lt;p&gt;Simply put, diodes ensure electrical current can only pass in one direction (&lt;a href=&#34;https://en.wikipedia.org/wiki/Diode&#34;&gt;wiki&lt;/a&gt;). Keyboards care about this because switches are wired in parallel with multiple keys sharing the same paths with the detection of key presses being based on shorting the path. To allow for multiple&lt;br /&gt;
-keys to be pressed at the same time along the same paths we need a clean signal path, which is exactly what the diodes are doing (&lt;a href=&#34;http://blog.komar.be/how-to-make-a-keyboard-the-matrix/]&#34;&gt;source&lt;/a&gt;).&lt;/p&gt;
-
-&lt;p&gt;Much deliberation with the keyboard gods later, and a lack of care for antighosting it was decided. I shorted D60 and directly joined the two pins together. With the use of &lt;a href=&#34;https://www.microsoft.com/appliedsciences/antighostingexplained.mspx&#34;&gt;mircosoft&amp;rsquo;s ghosting demo&lt;/a&gt; it turns out I got away lucky this time.&lt;/p&gt;
-
-&lt;p&gt;&lt;br&gt;
-// Disclaimer I&amp;rsquo;m no electrical engineer.
-&lt;br&gt;
-// TBC &lt;i&gt;firmware and footpedals.&lt;/i&gt;&lt;/p&gt;
-</description>
-    </item>
-    
-    <item>
-      <title>about</title>
-      <link>http://thisblog.iswell.cool/about/</link>
-      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
-      
-      <guid>http://thisblog.iswell.cool/about/</guid>
-      <description>&lt;p&gt;Music maker, android dev, mechanical keyboard enthusiast.
-&lt;a href=&#34;https://twitter.com/ouchadam&#34;&gt;@ouchadam&lt;/a&gt;&lt;/p&gt;
-
-&lt;p&gt;A collection of posts to help me remember how I built stuff. They will be smallish guides~ focused on the core steps and I&amp;rsquo;ll also be assuming that you&amp;rsquo;re using a unix based system let all the cool kids ;)&lt;/p&gt;
 </description>
     </item>
     
